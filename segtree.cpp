@@ -15,30 +15,32 @@ void setIO(string name = "")
 }
  
 struct item {
-    int m , c;
+    ll sum;
 };
  
  
 struct segtree{
     
-    item NEUTRAL_ELEMENT = {INT_MAX ,0};
+    item NEUTRAL_ELEMENT = {0};
  
     item merge( item x , item y){
-        if ( x.m < y.m) return x;
-        if ( x.m > y.m) return y;
-        return {x.m , x.c + y.c};
+        return {   
+            max(x.sum , y.sum)
+        };
     }
  
     item single (int v){
-        return {v,1};
+        item x ;
+        x.sum = v;
+        return x;
     }
  
     int size;
     vector < item > values;
-    void init( int n ){
+    void init( int n ){     
         size = 1;
         while(size < n) size *= 2;
-        values.resize(2*size);
+        values.assign(2*size, NEUTRAL_ELEMENT);
     }
  
  
@@ -75,19 +77,40 @@ struct segtree{
     void set( int i , int v){
         set( i , v , 0 , 0 , size);
     }
- 
-    item calc (int l , int r , int x , int lx , int rx){
-        if( lx >= r || l >= rx ) return NEUTRAL_ELEMENT;
-        if(lx >= l && rx <= r ) return values[x];
-        int m = (lx + rx)/2;
-        item s1 = calc(l, r , 2*x + 1 , lx , m);
-        item s2 = calc(l , r , 2*x + 2 , m , rx);
-        return merge(s1 , s2);
- 
+    int calc ( int k , int x , int lx , int rx){
+        if ( values[x].sum < k ) return -1;
+        if(rx - lx == 1) return lx;
+        int m = (rx + lx)/2;
+        if ( values[2*x + 1].sum >= k) return calc(k , 2*x + 1 , lx , m);
+        return calc(k , 2*x + 2 , m , rx);
     }
  
-    item calc(int l , int r){
-        return calc(l, r , 0 , 0 , size);
+    int calc( int k ){
+        return calc( k , 0 , 0 , size);
     }
+ 
 };
  
+int main(){
+    int n , m ;
+    cin >> n >> m;
+    vector < int > a(n);
+    for ( int &i : a) cin >> i;
+    segtree st;
+    st.init(n);
+    st.build(a);
+    while(m--){
+        int op;
+        cin >> op;
+        if (op == 1){
+            int i , v;
+            cin >> i >> v;
+            st.set(i,v);
+        }
+        else{
+            int x;
+            cin >> x;
+            cout << st.calc(x) << endl;
+        }
+    }
+}
