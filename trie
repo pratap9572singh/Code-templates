@@ -1,0 +1,101 @@
+#include <iostream>
+using namespace std;
+
+// code written by chatgpt 
+
+// Number of possible characters 'a' to 'z'
+const int ALPHABET_SIZE = 26;
+
+// Definition of a Trie Node
+class TrieNode {
+public:
+    TrieNode* children[ALPHABET_SIZE];
+    bool isEndOfWord;
+
+    // Constructor initializes the node
+    TrieNode() {
+        isEndOfWord = false;
+        for (int i = 0; i < ALPHABET_SIZE; ++i) {
+            children[i] = nullptr;
+        }
+    }
+};
+
+// Definition of the Trie
+class Trie {
+private:
+    TrieNode* root;
+
+public:
+    // Constructor initializes the trie with a root node
+    Trie() {
+        root = new TrieNode();
+    }
+
+    // Insert a word into the trie
+    void insert(const string& word) {
+        TrieNode* node = root;
+        for (char ch : word) {
+            int index = ch - 'a';
+            if (node->children[index] == nullptr) {
+                node->children[index] = new TrieNode();
+            }
+            node = node->children[index];
+        }
+        node->isEndOfWord = true;
+    }
+
+    // Search for a complete word
+    bool search(const string& word) {
+        TrieNode* node = root;
+        for (char ch : word) {
+            int index = ch - 'a';
+            if (node->children[index] == nullptr) {
+                return false;
+            }
+            node = node->children[index];
+        }
+        return node->isEndOfWord;
+    }
+
+    // Check if any word starts with the given prefix
+    bool startsWith(const string& prefix) {
+        TrieNode* node = root;
+        for (char ch : prefix) {
+            int index = ch - 'a';
+            if (node->children[index] == nullptr) {
+                return false;
+            }
+            node = node->children[index];
+        }
+        return true;
+    }
+};
+
+// Example usage
+int main() {
+    Trie trie;
+
+    trie.insert("apple");
+    trie.insert("app");
+    trie.insert("application");
+    trie.insert("bat");
+    trie.insert("ball");
+
+    cout << boolalpha; // print true/false instead of 1/0
+
+    cout << "Search 'apple': " << trie.search("apple") << endl;       // true
+    cout << "Search 'app': " << trie.search("app") << endl;           // true
+    cout << "Search 'appl': " << trie.search("appl") << endl;         // false
+    cout << "Search 'bat': " << trie.search("bat") << endl;           // true
+    cout << "Search 'ball': " << trie.search("ball") << endl;         // true
+    cout << "Search 'batt': " << trie.search("batt") << endl;         // false
+
+    cout << "Starts with 'app': " << trie.startsWith("app") << endl;  // true
+    cout << "Starts with 'ba': " << trie.startsWith("ba") << endl;    // true
+    cout << "Starts with 'bat': " << trie.startsWith("bat") << endl;  // true
+    cout << "Starts with 'batt': " << trie.startsWith("batt") << endl;// false
+    cout << "Starts with 'cat': " << trie.startsWith("cat") << endl;  // false
+
+    return 0;
+}
