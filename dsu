@@ -1,0 +1,36 @@
+#include <vector>
+#include <algorithm>
+
+struct DSU {
+    int n;
+    std::vector<int> parent;
+    std::vector<int> sz;
+
+    // Constructor: Initialize n elements (1-indexed)
+    DSU(int n) : n(n), parent(n + 1), sz(n + 1, 1) {
+        for (int i = 1; i <= n; ++i) {
+            parent[i] = i;
+        }
+    }
+
+    // Find with Path Compression
+    int find(int x) {
+        if (parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+
+    // Union by Size
+    void unite(int u, int v) {
+        u = find(u);
+        v = find(v);
+        if (u == v) return;
+
+        // Always attach the smaller tree to the root of the larger tree
+        if (sz[u] > sz[v]) {
+            std::swap(u, v);
+        }
+
+        parent[u] = v;
+        sz[v] += sz[u];
+    }
+};
